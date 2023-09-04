@@ -19,4 +19,12 @@ export class TrackRepository {
       skip: (page - 1) * limit,
     });
   }
+
+  findOneByUniqueId(uniqueId: string): Promise<Track | null> {
+    return this.db.track.findUnique({
+      where: {
+        uniqueId,
+      },
+    });
+  }
 }
