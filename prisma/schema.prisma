@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Like {
+  id         Int      @id @default(autoincrement())
+  playlistId Int
+  userId     BigInt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  Playlist   Playlist @relation(fields: [playlistId], references: [id])
+  User       User     @relation(fields: [userId], references: [userId])
+
+  @@unique([playlistId, userId])
+  @@index([userId], map: "Like_userId_fkey")
+}
+
+model Playlist {
+  id        Int      @id @default(autoincrement())
+  ownerId   BigInt
+  slug      String   @unique @db.VarChar(16)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  name      String   @db.VarChar(30)
+  viewCount Int      @default(0)
+  isPrivate Boolean  @default(false)
+  bannerId  String   @default("") @db.VarChar(90)
+  Like      Like[]
+  User      User     @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
+  Track     Track[]
+
+  @@index([ownerId], map: "Playlist_ownerId_fkey")
+}
+
+model Track {
+  id             Int      @id @default(autoincrement())
+  uniqueId       String   @unique
+  title          String
+  performer      String
+  file_unique_id String
+  file_id        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime
+  addedById      BigInt
+  playlistId     Int
+  thumbnail      String?  @default("")
+  duration       Int      @default(0)
+  User           User     @relation(fields: [addedById], references: [userId], onDelete: Cascade)
+  Playlist       Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+
+  @@index([addedById], map: "Track_addedById_fkey")
+  @@index([playlistId], map: "Track_playlistId_fkey")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  userId    BigInt     @unique
+  isAdmin   Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+  Like      Like[]
+  Playlist  Playlist[]
+  Track     Track[]
+
+  @@index([userId])
+}
