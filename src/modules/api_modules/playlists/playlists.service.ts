@@ -1,10 +1,21 @@
-import { HttpCode, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PlaylistsRepository } from './playlists.repository';
 import { ResponseFormat } from '../shared/interfaces/response.interface';
+import { Playlist } from './interfaces/playlists.interface';
+import { TrackRepository } from '../track/track.repository';
+import { Track } from '../track/interfaces/track.interface';
 
 @Injectable()
 export class PlaylistsService {
-  constructor(private playlistRepo: PlaylistsRepository) {}
+  constructor(
+    private playlistRepo: PlaylistsRepository,
+    private trackRepo: TrackRepository,
+  ) {}
 
   async getAllPublicPlaylists(
     page: number,
@@ -25,6 +36,36 @@ export class PlaylistsService {
     return {
       statusCode: HttpStatus.OK,
       data: playlists,
+    };
+  }
+  async getPlaylistTracks(
+    slug: string,
+    page: number,
+    limit: number,
+  ): Promise<ResponseFormat<any>> {
+    const playlist: Playlist | null =
+      await this.playlistRepo.findOneBySlug(slug);
+    if (!playlist) throw new NotFoundException('پلی لیست یافت نشد');
+
+    const tracksDB = await this.trackRepo.findTracksByPlaylistId(
+      playlist.id,
+      page,
+      limit,
+    );
+    const tracks = tracksDB.map((track: Track) => {
+      delete track.addedById;
+      // return track;
+      return {
+        uniqueId: track.uniqueId,
+        title: track.title,
+        performer: track.performer,
+        duration: track.duration,
+        isHaveThumbnail: !!track.thumbnail,
+      };
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data: tracks,
     };
   }
 }

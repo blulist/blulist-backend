@@ -2,7 +2,7 @@ import { applyDecorators, Get, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { ResponseInterceptor } from '../../shared/interceptors/response.interceptor';
 
-export function getAllPlaylistsApi() {
+export function GetAllPlaylistsApi() {
   return applyDecorators(
     ApiOperation({
       summary: 'Get All Public Playlists',
@@ -47,5 +47,37 @@ export function getAllPlaylistsApi() {
       },
     }),
     Get('/'),
+  );
+}
+
+export function GetPlaylistTracks() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'get playlist tracks',
+    }),
+    ApiOkResponse({
+      schema: {
+        example: {
+          statusCode: 200,
+          data: [
+            {
+              uniqueId: '18d2d2bb-1',
+              title: 'Adam Barfi~MelonMusic.ir',
+              performer: 'Parsalip',
+              duration: 165,
+              isHaveThumbnail: false,
+            },
+            {
+              uniqueId: '9e47930a-4',
+              title: 'H u r t',
+              performer: 'MooVan x Olafur Arnalds',
+              duration: 214,
+              isHaveThumbnail: true,
+            },
+          ],
+        },
+      },
+    }),
+    Get('/:slug/tracks'),
   );
 }
