@@ -9,7 +9,7 @@ import { TrackRepository } from '../track/track.repository';
 import { PlaylistsRepository } from '../playlists/playlists.repository';
 import {
   Playlist,
-  PlaylistResultEnum,
+  PlaylistOutTypeEnum,
 } from '../playlists/interfaces/playlists.interface';
 import { getFileLink } from '../shared/api/getFileUrl.api';
 import { ConfigService } from '@nestjs/config';
@@ -33,7 +33,7 @@ export class StreamService {
     if (!playlist) {
       playlist = (await this.playlistRepo.findOneBySlug(
         slug,
-        PlaylistResultEnum.Normal,
+        PlaylistOutTypeEnum.Normal,
       )) as Playlist | null;
 
       if (!playlist) throw new NotFoundException('پلی لیست یافت نشد');

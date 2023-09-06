@@ -1,7 +1,11 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PlaylistsRepository } from './playlists.repository';
 import { ResponseFormat } from '../shared/interfaces/response.interface';
-import { Playlist, PlaylistResultEnum } from './interfaces/playlists.interface';
+import {
+  Playlist,
+  PlaylistOutTypeEnum,
+  PlaylistWithCounts,
+} from './interfaces/playlists.interface';
 import { TrackRepository } from '../track/track.repository';
 import { Track } from '../track/interfaces/track.interface';
 
@@ -15,7 +19,7 @@ export class PlaylistsService {
   async getPlaylist(slug: string): Promise<ResponseFormat<any>> {
     const playlist = await this.playlistRepo.findOneBySlug(
       slug,
-      PlaylistResultEnum.WithCounts,
+      PlaylistOutTypeEnum.WithCounts,
     );
     if (!playlist) throw new NotFoundException('پلی لیست یافت نشد');
 
@@ -37,7 +41,12 @@ export class PlaylistsService {
     page: number,
     limit: number,
   ): Promise<ResponseFormat<any>> {
-    const playlistsDB = await this.playlistRepo.findAll(false, page, limit);
+    const playlistsDB: PlaylistWithCounts[] = await this.playlistRepo.findAll(
+      false,
+      page,
+      limit,
+      PlaylistOutTypeEnum.WithCounts,
+    );
     const playlists = playlistsDB.map((pl) => {
       return {
         slug: pl.slug,
@@ -61,7 +70,7 @@ export class PlaylistsService {
   ): Promise<ResponseFormat<any>> {
     const playlist: Playlist | null = await this.playlistRepo.findOneBySlug(
       slug,
-      PlaylistResultEnum.WithCounts,
+      PlaylistOutTypeEnum.WithCounts,
     );
     if (!playlist) throw new NotFoundException('پلی لیست یافت نشد');
 

@@ -1,7 +1,7 @@
 import { Playlist as _Playlist } from '@prisma/client';
 
 export interface Playlist extends _Playlist {}
-export interface PlaylistsWithCounts extends Playlist {
+export interface PlaylistWithCounts extends Playlist {
   _count: {
     Track: number;
     Like: number;
@@ -12,10 +12,10 @@ export interface PlaylistsWithCounts extends Playlist {
 //   ? PlaylistsWithCounts
 //   : Playlist;
 
-export enum PlaylistResultEnum {
+export enum PlaylistOutTypeEnum {
   Normal,
   WithCounts,
 }
 
-export type PlaylistResult<T extends PlaylistResultEnum> =
-  T extends PlaylistResultEnum.Normal ? Playlist : PlaylistsWithCounts;
+export type PlaylistResult<T extends PlaylistOutTypeEnum> =
+  T extends PlaylistOutTypeEnum.Normal ? Playlist : PlaylistWithCounts;

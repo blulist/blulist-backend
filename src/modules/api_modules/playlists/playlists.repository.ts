@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
+  PlaylistOutTypeEnum,
   PlaylistResult,
-  PlaylistResultEnum,
-  PlaylistsWithCounts,
 } from './interfaces/playlists.interface';
 import { Prisma } from '@prisma/client';
 
@@ -11,41 +10,46 @@ import { Prisma } from '@prisma/client';
 export class PlaylistsRepository {
   constructor(private db: PrismaService) {}
 
-  findAll(
+  findAll<T extends PlaylistOutTypeEnum>(
     isPrivate: boolean,
     page: number,
     limit: number,
-  ): Promise<PlaylistsWithCounts[]> {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    outType: T,
+  ): Promise<PlaylistResult<T>[]> {
+    let op = {};
+    if (outType === PlaylistOutTypeEnum.WithCounts) {
+      op = {
+        include: {
+          _count: {
+            select: {
+              Track: true,
+              Like: true,
+            },
+          },
+        },
+      };
+    }
     return this.db.playlist.findMany({
       where: {
         isPrivate: isPrivate,
       },
       take: limit,
       skip: (page - 1) * limit,
-      include: {
-        _count: {
-          select: {
-            Track: true,
-            Like: true,
-          },
-        },
-      },
+      ...op,
       orderBy: {
         createdAt: 'desc',
       },
-    });
+    }) as Promise<PlaylistResult<T>[]>;
   }
 
-  findOneBySlug<T extends PlaylistResultEnum>(
+  findOneBySlug<T extends PlaylistOutTypeEnum>(
     slug: string,
     outType: T,
   ): Promise<PlaylistResult<T> | null> {
     const op: Prisma.PlaylistFindUniqueArgs = {
       where: { slug },
     };
-    if (outType == PlaylistResultEnum.WithCounts) {
+    if (outType == PlaylistOutTypeEnum.WithCounts) {
       op.include = {
         _count: {
           select: {
