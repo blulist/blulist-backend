@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
-  Playlist,
+  PlaylistResult,
+  PlaylistResultEnum,
   PlaylistsWithCounts,
 } from './interfaces/playlists.interface';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PlaylistsRepository {
@@ -36,9 +38,25 @@ export class PlaylistsRepository {
     });
   }
 
-  findOneBySlug(slug: string): Promise<Playlist | null> {
-    return this.db.playlist.findUnique({
+  findOneBySlug<T extends PlaylistResultEnum>(
+    slug: string,
+    outType: T,
+  ): Promise<PlaylistResult<T> | null> {
+    const op: Prisma.PlaylistFindUniqueArgs = {
       where: { slug },
-    });
+    };
+    if (outType == PlaylistResultEnum.WithCounts) {
+      op.include = {
+        _count: {
+          select: {
+            Like: true,
+            Track: true,
+          },
+        },
+      };
+    }
+    return this.db.playlist.findUnique(op) as unknown as Promise<
+      PlaylistResult<T>
+    > | null;
   }
 }

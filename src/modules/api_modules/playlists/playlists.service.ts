@@ -1,12 +1,7 @@
-import {
-  HttpCode,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PlaylistsRepository } from './playlists.repository';
 import { ResponseFormat } from '../shared/interfaces/response.interface';
-import { Playlist } from './interfaces/playlists.interface';
+import { Playlist, PlaylistResultEnum } from './interfaces/playlists.interface';
 import { TrackRepository } from '../track/track.repository';
 import { Track } from '../track/interfaces/track.interface';
 
@@ -16,6 +11,27 @@ export class PlaylistsService {
     private playlistRepo: PlaylistsRepository,
     private trackRepo: TrackRepository,
   ) {}
+
+  async getPlaylist(slug: string): Promise<ResponseFormat<any>> {
+    const playlist = await this.playlistRepo.findOneBySlug(
+      slug,
+      PlaylistResultEnum.WithCounts,
+    );
+    if (!playlist) throw new NotFoundException('پلی لیست یافت نشد');
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: {
+        slug: playlist.slug,
+        name: playlist.name,
+        isHaveBanner: !!playlist.bannerId,
+        viewCount: playlist.viewCount,
+        createdAt: playlist.createdAt,
+        tracksCount: playlist._count.Track,
+        likesCount: playlist._count.Like,
+      },
+    };
+  }
 
   async getAllPublicPlaylists(
     page: number,
@@ -43,8 +59,10 @@ export class PlaylistsService {
     page: number,
     limit: number,
   ): Promise<ResponseFormat<any>> {
-    const playlist: Playlist | null =
-      await this.playlistRepo.findOneBySlug(slug);
+    const playlist: Playlist | null = await this.playlistRepo.findOneBySlug(
+      slug,
+      PlaylistResultEnum.WithCounts,
+    );
     if (!playlist) throw new NotFoundException('پلی لیست یافت نشد');
 
     const tracksDB = await this.trackRepo.findTracksByPlaylistId(

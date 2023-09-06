@@ -1,26 +1,399 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fa">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Music Player</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+        background-color: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh; /* این کد به شما کمک می‌کند تا صفحه را از پایین تا بالا پر کنید */
+    }
+
+        .navbar {
+            background-color: #007BFF;
+        }
+
+        .navbar-brand {
+            color: #fff;
+        }
+
+        .container {
+            padding-top: 20px;
+        }
+
+        .playlist-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .playlist-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .playlist-card img {
+            max-width: 100%;
+            max-height: 54%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .playlist-name {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .btn-playlist {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-playlist:hover {
+            background-color: #0056b3;
+        }
+
+        .audio-player {
+            width: 100%;
+        }
+        .playlist-img {
+            height: 50%;
+        }
+        /* اضافه کردن استایل به progressBar */
+        .progress-container {
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .custom-progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #007BFF;
+            border-radius: 5px;
+            transition: width 0.1s linear;
+        }
+    </style>
 </head>
 <body>
-<h1>
-    Banner:
-</h1>
-<img src="http://localhost:3000/stream/playlist/b42f7ecd/banner" alt="ss"/>
-<br/>
-<h1>
-    thumbnail:
-</h1>
-<img src="http://localhost:3000/stream/track/9e47930a-4/thumbnail"/>
-<br/>
-<h1>
-    Mp3 File
-</h1>
-<audio src="http://localhost:3000/stream/track/9e47930a-4/mp" autoplay controls></audio>
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="#">نام سرویس شما</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>پلی لیست ها</h1>
+    <div class="playlist-container" id="playlist-list">
+        <!-- پلی لیست ها در اینجا قرار خواهند گرفت -->
+    </div>
+
+    <h2>جزئیات ترک</h2>
+    <div class="audio-player-container mb-10">
+        <div class="bg-white border-slate-100 dark:bg-slate-800 dark:border-slate-500 border-b rounded-t-xl p-4 pb-6 sm:p-10 sm:pb-8 lg:p-6 xl:p-10 xl:pb-8 space-y-6 sm:space-y-8 lg:space-y-6 xl:space-y-8 ">
+            <div class="flex items-center space-x-4">
+                <img  id="track-thumbnail" alt="" width="88" height="88" class="flex-none rounded-lg bg-slate-100" loading="lazy" />
+                <div class="min-w-0 flex-auto space-y-1 font-semibold">
+                    <p class="text-cyan-500 dark:text-cyan-400 text-sm leading-6">
+
+                    </p>
+                    <h2 class="text-slate-500 dark:text-slate-400 text-sm leading-6 truncate"  id="track-title">
+
+                    </h2>
+                    <p class="text-slate-900 dark:text-slate-50 text-lg" id="track-performer">
+
+                    </p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="relative">
+                    <div class="bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div class="bg-black dark:bg-cyan-400 w-1/2 h-2" role="progressbar" aria-label="music progress" aria-valuenow="1456" aria-valuemin="0" aria-valuemax="4550"></div>
+                    </div>
+                    <div class="ring-cyan-500 dark:ring-cyan-400 ring-2 absolute left-1/2 top-1/2 w-4 h-4 -mt-2 -ml-2 flex items-center justify-center bg-white rounded-full shadow">
+                        <div class="w-1.5 h-1.5 bg-cyan-500 dark:bg-cyan-400 rounded-full ring-1 ring-inset ring-slate-900/5"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-sm leading-6 font-medium tabular-nums">
+                    <div class="text-cyan-500 dark:text-slate-100" id="current-duration">24:16</div>
+                    <div class="text-slate-500 dark:text-slate-400" id="duration">75:50</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray text-slate-500 dark:bg-slate-600 dark:text-slate-200 rounded-b-xl flex items-center">
+            <div class="flex-auto flex items-center justify-evenly">
+                <button type="button" aria-label="Add to favorites">
+                    <svg width="24" height="24">
+                        <path d="M7 6.931C7 5.865 7.853 5 8.905 5h6.19C16.147 5 17 5.865 17 6.931V19l-5-4-5 4V6.931Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <button type="button" class="hidden sm:block lg:hidden xl:block" id="prev-button" aria-label="Previous">
+                  ⏭️
+                </button>
+
+            </div>
+            <button type="button" id="toggle-play" class="bg-white text-slate-900 dark:bg-slate-100 dark:text-slate-700 flex-none -my-2 mx-auto w-20 h-20 rounded-full ring-1 ring-slate-900/5 shadow-md flex items-center justify-center" aria-label="Pause">
+                <svg width="30" height="32" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="24" rx="2" />
+                    <rect x="20" y="4" width="4" height="24" rx="2" />
+                </svg>
+            </button>
+            <div class="flex-auto flex items-center justify-evenly">
+                <button type="button" id="next-button">
+                    ⏭️
+                </button>
+                <button type="button" class="hidden sm:block lg:hidden xl:block" aria-label="Next">
+                    <svg width="24" height="24" fill="none">
+                        <path d="M14 12 6 6v12l8-6Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M18 6v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <button type="button" class="rounded-lg text-xs leading-6 font-semibold px-2 ring-2 ring-inset ring-slate-500 text-slate-500 dark:text-slate-100 dark:ring-0 dark:bg-slate-500">
+                    1x
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="lg:col-span-5 xl:col-span-6 flex flex-col">
+        <div class="relative z-10 bg-white rounded-xl shadow-xl ring-1 ring-slate-900/5 divide-y divide-slate-100 my-auto xl:mt-18 dark:bg-slate-800 dark:divide-slate-200/5 dark:highlight-white/10" id="track-list">
+            <nav class="py-4 px-4 sm:px-6 lg:px-4 xl:px-6 text-sm font-medium">
+                <ul class="flex space-x-3">
+                        ترک های پلی لیـست
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.min.js"></script>
+<script>
+    let playlists = [];
+    let currentPlaylistIndex = 0;
+    let tracks = [];
+    let currentTrackIndex = 0;
+    let audioPlayer;
+    let isPlaying = false;
+
+    function getPlaylists() {
+        $.ajax({
+            url: 'http://localhost:3000/playlists?page=1&limit=20',
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                playlists = data.data;
+                displayPlaylists(playlists);
+            }
+        });
+    }
+
+    function getTracks(slug) {
+        $.ajax({
+            url: `http://localhost:3000/playlists/${slug}/tracks?page=1&limit=20`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                tracks = data.data;
+                displayTracks(tracks);
+                playTrack(tracks[0]);
+            }
+        });
+    }
+
+    function displayPlaylists(playlists) {
+        const playlistContainer = $('#playlist-list');
+        playlistContainer.empty();
+
+        playlists.forEach(playlist => {
+            const playlistCard = $('<div>').addClass('playlist-card');
+            const playlistImage = $('<img>').addClass("playlist-img").attr('src', playlist.isHaveBanner ? `http://localhost:3000/stream/playlist/${playlist.slug}/banner` : `https://source.unsplash.com/random`);
+            const playlistName = $('<p>').addClass('playlist-name').text(playlist.name);
+            const playlistButton = $('<button>').addClass('btn-playlist').text('پخش');
+            playlistButton.click(function () {
+                currentPlaylistIndex = playlists.indexOf(playlist);
+                getTracks(playlist.slug);
+            });
+
+            playlistCard.append(playlistImage, playlistName, playlistButton);
+            playlistContainer.append(playlistCard);
+        });
+    }
+
+    function displayTracks(tracks) {
+        const trackList = $('#track-list');
+        trackList.empty();
+
+        tracks.forEach(track => {
+            trackList.append(addTrackToX(track));
+        });
+            $(".play-t").click((e)=>{
+                const dataTrackValue = e.currentTarget.dataset.track // $(this).attr('data-track');
+                const track_ = tracks.find(t => t.uniqueId === dataTrackValue);
+                console.log(track_);
+                playTrack(track_);
+            })
+
+        // تقسیم ترک‌ها به صورت ردیفی با چهار ترک در هر ردیف
+        const trackRows = Math.ceil(tracks.length / 4);
+        for (let i = 0; i < trackRows; i++) {
+            const row = $('<div>').addClass('track-row');
+            trackList.children().slice(i * 4, (i + 1) * 4).appendTo(row);
+            trackList.append(row);
+        }
+    }
+    function togglePlayPause(track) {
+        if (audioPlayer && isPlaying) {
+            audioPlayer.pause();
+            isPlaying = false;
+        } else {
+            playTrack(track);
+            isPlaying = true;
+        }
+    }
+
+    function playTrack(track) {
+        if (audioPlayer) {
+            audioPlayer.pause();
+        }
+
+        audioPlayer = new Audio(`http://localhost:3000/stream/track/${track.uniqueId}/mp`);
+        audioPlayer.play();
+
+        audioPlayer.onended = function () {
+            if (currentTrackIndex < tracks.length - 1) {
+                currentTrackIndex++;
+                playTrack(tracks[currentTrackIndex]);
+            } else {
+                console.log("پایان پلی لیست");
+            }
+        };
+
+        $('#track-thumbnail').attr('src', `http://localhost:3000/stream/track/${track.uniqueId}/thumbnail`);
+        $('#track-title').text(track.title);
+        $('#track-performer').text(track.performer);
+        isPlaying = true;
+
+        updateProgressBar();
+    }
+
+    function updateProgressBar() {
+        const progressBar = $('#progress-bar');
+
+        audioPlayer.addEventListener('timeupdate', function () {
+            const currentTime = audioPlayer.currentTime;
+            const duration = audioPlayer.duration;
+            const progress = (currentTime / duration) * 100;
+            progressBar.css('width', progress + '%');
+        });
+    }
+
+    function addTrackToX(track){
+        return `
+                    <article class="p-4 sm:p-6 lg:p-4 xl:p-6 space-x-4 items-start sm:space-x-6 lg:space-x-4 xl:space-x-6 flex">
+                <img src="${`http://localhost:3000/stream/track/${track.uniqueId}/thumbnail`}" loading="lazy" decoding="async" alt="" width="60" height="88" class="flex-none rounded-md bg-slate-100" />
+                <div class="min-w-0 relative flex-auto play-t hover:bg-gray-100 hover:cursor-pointer" data-track="${track.uniqueId}">
+                    <h2 class="font-semibold text-slate-900 truncate sm:pr-20 dark:text-slate-100">${track.title}</h2>
+                    <dl class="mt-2 flex flex-wrap text-sm leading-6 font-medium">
+                        <div class="hidden absolute top-0 right-0 sm:flex items-center space-x-1 dark:text-slate-100">
+                            <dt class="text-sky-500">
+                                <span class="sr-only">Star rating</span>
+                                <svg width="16" height="20" fill="currentColor">
+                                    <path
+                                            d="M7.05 3.691c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.372 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.539 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.783.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.363-1.118L.98 9.483c-.784-.57-.381-1.81.587-1.81H5.03a1 1 0 00.95-.69L7.05 3.69z"
+                                    ></path>
+                                </svg>
+                            </dt>
+                        </div>
+                        <div class="dark:text-slate-200">
+                            <dt class="sr-only">Rating</dt>
+                            <dd class="px-1.5 ring-1 ring-slate-200 rounded dark:ring-slate-600">PG-13</dd>
+                        </div>
+                        <div class="ml-2">
+                            <dt class="sr-only">Year</dt>
+                            <dd>2021</dd>
+                        </div>
+                        <div>
+                            <dt class="sr-only">Genre</dt>
+                            <dd class="flex items-center">
+                                <svg width="2" height="2" fill="currentColor" class="mx-2 text-slate-300" aria-hidden="true"><circle cx="1" cy="1" r="1"></circle></svg>Comedy
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="sr-only">Runtime</dt>
+                            <dd class="flex items-center">
+                                <svg width="2" height="2" fill="currentColor" class="mx-2 text-slate-300" aria-hidden="true"><circle cx="1" cy="1" r="1"></circle></svg>1h 46m
+                            </dd>
+                        </div>
+                        <div class="flex-none w-full mt-2 font-normal">
+                            <dt class="sr-only">Cast</dt>
+                            <dd class="text-slate-400">${track.performer}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </article>
+
+
+        `
+    }
+
+    // دکمه "بعدی"
+    $('#next-button').click(function () {
+        if (currentTrackIndex < tracks.length - 1) {
+            currentTrackIndex++;
+            playTrack(tracks[currentTrackIndex]);
+        }
+    });
+
+    // دکمه "توقف"
+    $('#stop-button').click(function () {
+        if (audioPlayer && isPlaying) {
+            audioPlayer.pause();
+            isPlaying = false;
+        }
+    });
+
+    // دکمه "قبلی"
+    $('#prev-button').click(function () {
+        if (currentTrackIndex > 0) {
+            currentTrackIndex--;
+            playTrack(tracks[currentTrackIndex]);
+        }
+    });
+
+    // دکمه "بعدی" پلی لیست
+    $('#next-playlist-button').click(function () {
+        if (currentPlaylistIndex < playlists.length - 1) {
+            currentPlaylistIndex++;
+            getTracks(playlists[currentPlaylistIndex].slug);
+        }
+    });
+
+    // دکمه "قبلی" پلی لیست
+    $('#prev-playlist-button').click(function () {
+        if (currentPlaylistIndex > 0) {
+            currentPlaylistIndex--;
+            getTracks(playlists[currentPlaylistIndex].slug);
+        }
+    });
+
+    // درخواست دریافت پلی لیست ها
+    getPlaylists();
+</script>
 </body>
 </html>

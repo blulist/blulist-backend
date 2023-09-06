@@ -7,7 +7,10 @@ import {
 import { RedisService } from '../../redis/redis.service';
 import { TrackRepository } from '../track/track.repository';
 import { PlaylistsRepository } from '../playlists/playlists.repository';
-import { Playlist } from '../playlists/interfaces/playlists.interface';
+import {
+  Playlist,
+  PlaylistResultEnum,
+} from '../playlists/interfaces/playlists.interface';
 import { getFileLink } from '../shared/api/getFileUrl.api';
 import { ConfigService } from '@nestjs/config';
 import { Configs } from '../../../config/configuration';
@@ -30,6 +33,7 @@ export class StreamService {
     if (!playlist) {
       playlist = (await this.playlistRepo.findOneBySlug(
         slug,
+        PlaylistResultEnum.Normal,
       )) as Playlist | null;
 
       if (!playlist) throw new NotFoundException('پلی لیست یافت نشد');

@@ -1,7 +1,42 @@
 import { applyDecorators, Get, UseInterceptors } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ResponseInterceptor } from '../../shared/interceptors/response.interceptor';
 
+export function GetPlaylist() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'Get Public Playlist',
+    }),
+    UseInterceptors(ResponseInterceptor),
+    ApiParam({
+      name: 'slug',
+      required: true,
+      example: '96aa8e44',
+    }),
+    ApiOkResponse({
+      schema: {
+        example: {
+          statusCode: 200,
+          data: {
+            slug: 'e9d2b7f0',
+            name: '🌱 شجریـآن چیل',
+            isHaveBanner: true,
+            viewCount: 4,
+            createdAt: '2023-09-05T13:18:27.457Z',
+            tracksCount: 6,
+            likesCount: 0,
+          },
+        },
+      },
+    }),
+    Get('/:slug'),
+  );
+}
 export function GetAllPlaylistsApi() {
   return applyDecorators(
     ApiOperation({
@@ -16,31 +51,31 @@ export function GetAllPlaylistsApi() {
           statusCode: 200,
           data: [
             {
-              slug: '96aa8e44',
-              name: 'Test',
-              viewCount: 'Test',
-              isHaveBanner: true,
-              createdAt: '2023-09-02T09:44:08.591Z',
-              tracksCount: 60,
-              likesCount: 1000,
-            },
-            {
-              slug: '29f0f1d7',
-              name: 'HipHop | Rap',
-              viewCount: 'HipHop | Rap',
+              slug: 'd0192c40',
+              name: 'test',
               isHaveBanner: false,
-              createdAt: '2023-09-02T09:26:47.266Z',
-              tracksCount: 0,
+              viewCount: 0,
+              createdAt: '2023-09-05T22:26:14.802Z',
+              tracksCount: 1,
               likesCount: 0,
             },
             {
-              slug: 'b42f7ecd',
-              name: '☔️ Soft & Chill',
-              viewCount: '☔️ Soft & Chill',
+              slug: 'e9d2b7f0',
+              name: '🌱 شجریـآن چیل',
               isHaveBanner: true,
-              createdAt: '2023-09-01T11:48:18.796Z',
-              tracksCount: 9,
-              likesCount: 1,
+              viewCount: 4,
+              createdAt: '2023-09-05T13:18:27.457Z',
+              tracksCount: 6,
+              likesCount: 0,
+            },
+            {
+              slug: 'ffc8619c',
+              name: '🤌 rap remix',
+              isHaveBanner: true,
+              viewCount: 1,
+              createdAt: '2023-09-05T12:43:21.145Z',
+              tracksCount: 1,
+              likesCount: 0,
             },
           ],
         },

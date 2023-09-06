@@ -7,3 +7,15 @@ export interface PlaylistsWithCounts extends Playlist {
     Like: number;
   };
 }
+
+// export type ConditionalPlaylist<T extends boolean> = T extends true
+//   ? PlaylistsWithCounts
+//   : Playlist;
+
+export enum PlaylistResultEnum {
+  Normal,
+  WithCounts,
+}
+
+export type PlaylistResult<T extends PlaylistResultEnum> =
+  T extends PlaylistResultEnum.Normal ? Playlist : PlaylistsWithCounts;

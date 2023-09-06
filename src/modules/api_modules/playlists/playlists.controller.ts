@@ -1,6 +1,7 @@
 import { Controller, Param, Query } from '@nestjs/common';
 import {
   GetAllPlaylistsApi,
+  GetPlaylist,
   GetPlaylistTracks,
 } from './decorators/playlists-api.decorator';
 import { PlaylistsService } from './playlists.service';
@@ -10,6 +11,11 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('/playlists')
 export class PlaylistsController {
   constructor(private playlistsService: PlaylistsService) {}
+  @GetPlaylist()
+  onGetPlaylist(@Param('slug') slug: string) {
+    return this.playlistsService.getPlaylist(slug);
+  }
+
   @GetAllPlaylistsApi()
   onGetAllPlaylists(
     @Query('page') page: number,
