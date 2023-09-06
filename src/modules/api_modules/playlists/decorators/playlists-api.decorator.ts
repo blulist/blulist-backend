@@ -1,5 +1,6 @@
 import { applyDecorators, Get, UseInterceptors } from '@nestjs/common';
 import {
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -31,6 +32,15 @@ export function GetPlaylist() {
             tracksCount: 6,
             likesCount: 0,
           },
+        },
+      },
+    }),
+    ApiNotFoundResponse({
+      schema: {
+        example: {
+          message: 'پلی لیست یافت نشد',
+          error: 'Not Found',
+          statusCode: 404,
         },
       },
     }),
@@ -110,6 +120,15 @@ export function GetPlaylistTracks() {
               isHaveThumbnail: true,
             },
           ],
+        },
+      },
+    }),
+    ApiNotFoundResponse({
+      schema: {
+        example: {
+          message: 'پلی لیست یافت نشد',
+          error: 'Not Found',
+          statusCode: 404,
         },
       },
     }),

@@ -123,7 +123,7 @@ export class StreamService {
       track = JSON.parse(track as string) as Track;
     }
 
-    if (!track.file_id) throw new BadRequestException('موزیک  ندارد');
+    if (!track.file_id) throw new NotFoundException('موزیک یافت نشد.');
 
     const musicFileUrl = await getFileLink(track.file_id, this.configService);
 
