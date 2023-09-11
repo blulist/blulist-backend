@@ -4,6 +4,7 @@ services:
     build:
       context: ../bluelist
       dockerfile: Dockerfile
+    restart: always
     env_file:
       - ../bluelist/.env
     environment:
@@ -21,9 +22,11 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
+    restart: always
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@progress-db/blulist?schema=public
       - REDIS_URL=redis://redis:6379/0
+      - APP_MODE=DEVELOPMENT
     depends_on:
       - progress-db
       - redis
@@ -34,6 +37,7 @@ services:
 
   progress-db:
     image: postgres:13
+    restart: always
     env_file:
       - ./.env
     environment:
@@ -52,6 +56,19 @@ services:
     networks:
       - app-network
 
+  # nginx:
+  #   container_name: nginx
+  #   restart: always
+  #   image: nginx
+  #   ports:
+  #     - '80:80'
+  #     - '443:443'
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./certbot/conf:/etc/letsencrypt
+  #     - ./certbot/www:/var/www/certbot
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:
