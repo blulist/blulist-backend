@@ -27,6 +27,8 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@progress-db/blulist?schema=public
       - REDIS_URL=redis://redis:6379/0
       - APP_MODE=DEVELOPMENT
+      - TELETEGRAM_SERVICE=http://bot:4000
+
     depends_on:
       - progress-db
       - redis
@@ -34,6 +36,7 @@ services:
       - app-network
     ports:
       - "${PORT}:${PORT}"
+
 
   progress-db:
     image: postgres:13
