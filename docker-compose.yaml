@@ -1,0 +1,60 @@
+version: '3'
+services:
+  bot:
+    build:
+      context: ../bluelist
+      dockerfile: Dockerfile
+    env_file:
+      - ../bluelist/.env
+    environment:
+     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@progress-db/blulist?schema=public
+     - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - progress-db
+      - redis
+    ports:
+      - "4000:4000"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@progress-db/blulist?schema=public
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - progress-db
+      - redis
+    networks:
+      - app-network
+    ports:
+      - "${PORT}:${PORT}"
+
+  progress-db:
+    image: postgres:13
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      - app-network
+    ports:
+      - 5432:5432
+    volumes:
+      - ../db-data:/var/lib
+
+  redis:
+    image: redis:6
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+
+volumes:
+  db-data:
