@@ -1,7 +1,7 @@
 import { applyDecorators, Get } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 
-export function ApiGetTrackBySlug() {
+export function ApiGetTrackByUniqueId() {
   return applyDecorators(
     ApiNotFoundResponse({
       schema: {
@@ -27,6 +27,6 @@ export function ApiGetTrackBySlug() {
         },
       },
     }),
-    Get('/:slug'),
+    Get('/:uniqueId'),
   );
 }

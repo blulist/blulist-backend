@@ -1,6 +1,6 @@
 import { Controller, Param, UseFilters, UseInterceptors } from '@nestjs/common';
 import { TrackService } from './track.service';
-import { ApiGetTrackBySlug } from './decorators/track-api.decorator';
+import { ApiGetTrackByUniqueId } from './decorators/track-api.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { ResponseInterceptor } from '../shared/interceptors/response.interceptor';
 import { HttpExceptionFilter } from '../shared/filters/http-exception.filter';
@@ -12,8 +12,8 @@ import { HttpExceptionFilter } from '../shared/filters/http-exception.filter';
 export class TrackController {
   constructor(private trackService: TrackService) {}
 
-  @ApiGetTrackBySlug()
-  onGetTrack(@Param('slug') slug: string) {
-    return this.trackService.getTrackBySlug(slug);
+  @ApiGetTrackByUniqueId()
+  onGetTrack(@Param('uniqueId') uniqueId: string) {
+    return this.trackService.getTrackBySlug(uniqueId);
   }
 }
