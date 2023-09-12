@@ -1,5 +1,9 @@
 import { applyDecorators, Get } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 
 export function ApiGetPlaylistBanner() {
   return applyDecorators(
@@ -60,6 +64,9 @@ export function ApiStreamTrack() {
           statusCode: 404,
         },
       },
+    }),
+    ApiOperation({
+      summary: 'streaming track',
     }),
     Get('track/:uniqueId/mp'),
   );
