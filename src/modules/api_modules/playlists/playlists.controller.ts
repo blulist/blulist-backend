@@ -1,10 +1,4 @@
-import {
-  Controller,
-  InternalServerErrorException,
-  Param,
-  Query,
-  UseFilters,
-} from '@nestjs/common';
+import { Controller, Param, Query, UseFilters } from '@nestjs/common';
 import {
   GetAllPlaylistsApi,
   GetPlaylist,
