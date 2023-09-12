@@ -9,7 +9,7 @@ export class LoggingService implements LoggerService {
     private messageLogger: MessageLogger,
   ) {}
   error(message: any, ...optionalParams: any[]): any {
-    this.messageLogger.error(message);
+    this.messageLogger.error(message, optionalParams[0]);
   }
 
   log(message: any, ...optionalParams: any[]): any {

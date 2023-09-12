@@ -1,4 +1,10 @@
-import { Controller, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  InternalServerErrorException,
+  Param,
+  Query,
+  UseFilters,
+} from '@nestjs/common';
 import {
   GetAllPlaylistsApi,
   GetPlaylist,
@@ -6,8 +12,10 @@ import {
 } from './decorators/playlists-api.decorator';
 import { PlaylistsService } from './playlists.service';
 import { ApiTags } from '@nestjs/swagger';
+import { HttpExceptionFilter } from '../shared/filters/http-exception.filter';
 
 @ApiTags('🎶 Playlists')
+@UseFilters(HttpExceptionFilter)
 @Controller('/playlists')
 export class PlaylistsController {
   constructor(private playlistsService: PlaylistsService) {}

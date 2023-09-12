@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseFilters } from '@nestjs/common';
 import { StreamService } from './stream.service';
 import { ApiTags } from '@nestjs/swagger';
 import {
@@ -6,8 +6,10 @@ import {
   ApiGetTrackThumbnail,
   ApiStreamTrack,
 } from './decorators/stream-api.decorator';
+import { HttpExceptionFilter } from '../shared/filters/http-exception.filter';
 
 @ApiTags('📥 Stream')
+@UseFilters(HttpExceptionFilter)
 @Controller('stream')
 export class StreamController {
   constructor(private streamService: StreamService) {}
