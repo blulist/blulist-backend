@@ -28,11 +28,14 @@ export class PlaylistsController {
   onGetAllPlaylists(
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Query('sort') sort: string | null,
   ) {
     page = Number(page) || 1;
     limit = Number(limit) || 10;
     if (limit > 30) limit = 10;
-    return this.playlistsService.getAllPublicPlaylists(page, limit);
+    if (!['like', 'view'].includes(sort)) sort = null;
+
+    return this.playlistsService.getAllPublicPlaylists(page, limit, sort);
   }
 
   @GetPlaylistTracks()

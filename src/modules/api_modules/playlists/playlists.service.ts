@@ -40,11 +40,13 @@ export class PlaylistsService {
   async getAllPublicPlaylists(
     page: number,
     limit: number,
+    sort: string | null,
   ): Promise<ResponseFormat<any>> {
     const playlistsDB: PlaylistWithCounts[] = await this.playlistRepo.findAll(
       false,
       page,
       limit,
+      sort,
       PlaylistOutTypeEnum.WithCounts,
     );
     const playlists = playlistsDB.map((pl) => {

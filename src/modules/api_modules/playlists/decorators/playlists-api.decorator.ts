@@ -53,8 +53,22 @@ export function GetAllPlaylistsApi() {
       summary: 'Get All Public Playlists',
     }),
     UseInterceptors(ResponseInterceptor),
-    ApiQuery({ name: 'page', required: true, type: Number }),
-    ApiQuery({ name: 'limit', required: true, type: Number }),
+    ApiQuery({ name: 'page', required: true, type: Number, example: 1 }),
+    ApiQuery({
+      name: 'limit',
+      required: true,
+      type: Number,
+      example: 10,
+      description: 'Max: 30',
+    }),
+    ApiQuery({
+      name: 'sort',
+      required: false,
+      type: String,
+      schema: {
+        enum: ['like', 'view'],
+      },
+    }),
     ApiOkResponse({
       schema: {
         example: {

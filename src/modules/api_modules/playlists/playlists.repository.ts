@@ -14,20 +14,40 @@ export class PlaylistsRepository {
     isPrivate: boolean,
     page: number,
     limit: number,
+    sort: string | null,
     outType: T,
   ): Promise<PlaylistResult<T>[]> {
-    let op = {};
+    const op: any = {
+      orderBy: [
+        {
+          createdAt: 'desc',
+        },
+      ],
+    };
     if (outType === PlaylistOutTypeEnum.WithCounts) {
-      op = {
-        include: {
-          _count: {
-            select: {
-              Track: true,
-              Like: true,
-            },
+      op.include = {
+        _count: {
+          select: {
+            Track: true,
+            Like: true,
           },
         },
       };
+    }
+
+    if (sort) {
+      op.orderBy = [];
+      if (sort == 'like') {
+        op.orderBy.push({
+          Like: {
+            _count: 'desc',
+          },
+        });
+      } else {
+        op.orderBy.push({
+          viewCount: 'desc',
+        });
+      }
     }
     return this.db.playlist.findMany({
       where: {
@@ -36,9 +56,6 @@ export class PlaylistsRepository {
       take: limit,
       skip: (page - 1) * limit,
       ...op,
-      orderBy: {
-        createdAt: 'desc',
-      },
     }) as Promise<PlaylistResult<T>[]>;
   }
 
