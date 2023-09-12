@@ -1,0 +1,80 @@
+version: '3'
+services:
+  bot:
+    build:
+      context: ../bluelist
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - ../bluelist/.env
+    environment:
+     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@progress-db/blulist?schema=public
+     - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - progress-db
+      - redis
+    ports:
+      - "4000:4000"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@progress-db/blulist?schema=public
+      - REDIS_URL=redis://redis:6379/0
+      - APP_MODE=DEVELOPMENT
+      - TELETEGRAM_SERVICE=http://bot:4000
+
+    depends_on:
+      - progress-db
+      - redis
+    networks:
+      - app-network
+    ports:
+      - "${PORT}:${PORT}"
+
+
+  progress-db:
+    image: postgres:13
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    networks:
+      - app-network
+    ports:
+      - 5432:5432
+    volumes:
+      - ../db-data:/var/lib
+
+  redis:
+    image: redis:6
+    networks:
+      - app-network
+
+  # nginx:
+  #   container_name: nginx
+  #   restart: always
+  #   image: nginx
+  #   ports:
+  #     - '80:80'
+  #     - '443:443'
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./certbot/conf:/etc/letsencrypt
+  #     - ./certbot/www:/var/www/certbot
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+
+volumes:
+  db-data:
