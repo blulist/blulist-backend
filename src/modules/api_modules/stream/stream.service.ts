@@ -16,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { Configs } from '../../../config/configuration';
 import { streamFileApi } from '../shared/api/stream.api';
 import { Track } from '../track/interfaces/track.interface';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class StreamService {
@@ -100,7 +101,7 @@ export class StreamService {
       type: 'image/jpeg',
     });
   }
-  async streamTrack(uniqueId: string) {
+  async streamTrack(uniqueId: string, req: Request, res: Response) {
     let track: string | Track | null = await this.redisService.get(
       `blu:track:${uniqueId}`,
     );
@@ -110,6 +111,7 @@ export class StreamService {
       )) as Track | null;
 
       if (!track) throw new NotFoundException('موزیک یافت نشد');
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       track.addedById = Number(track.addedById);
@@ -127,11 +129,14 @@ export class StreamService {
 
     const musicFileUrl = await getFileLink(track.file_id, this.configService);
 
-    const response = await streamFileApi(musicFileUrl);
 
-    return new StreamableFile(response.data, {
-      length: Number(response.headers['content-length']),
-      type: 'audio/mpeg',
-    });
+    const response = await streamFileApi(musicFileUrl, req.headers.range);
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Content-Length', response.headers['content-length']);
+    res.setHeader('Content-Range', response.headers['content-range']);
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+
+    response.data.pipe(res);
   }
 }

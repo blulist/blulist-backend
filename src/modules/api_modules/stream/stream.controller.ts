@@ -1,4 +1,4 @@
-import { Controller, Param, UseFilters } from '@nestjs/common';
+import { Controller, Param, Req, Res, UseFilters } from '@nestjs/common';
 import { StreamService } from './stream.service';
 import { ApiTags } from '@nestjs/swagger';
 import {
@@ -8,6 +8,7 @@ import {
 } from './decorators/stream-api.decorator';
 import { HttpExceptionFilter } from '../shared/filters/http-exception.filter';
 import { SkipThrottle } from '@nestjs/throttler';
+import { Request, Response } from 'express';
 
 @ApiTags('📥 Stream')
 @UseFilters(HttpExceptionFilter)
@@ -27,7 +28,11 @@ export class StreamController {
   }
 
   @ApiStreamTrack()
-  onStreamTrack(@Param('uniqueId') uniqueId: string) {
-    return this.streamService.streamTrack(uniqueId);
+  onStreamTrack(
+    @Param('uniqueId') uniqueId: string,
+    @Req() req: Request,
+    @Res({ passthrough: false }) res: Response,
+  ) {
+    return this.streamService.streamTrack(uniqueId, req, res);
   }
 }
