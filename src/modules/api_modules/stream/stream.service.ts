@@ -129,14 +129,18 @@ export class StreamService {
 
     const musicFileUrl = await getFileLink(track.file_id, this.configService);
 
-
     const response = await streamFileApi(musicFileUrl, req.headers.range);
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Content-Length', response.headers['content-length']);
-    res.setHeader('Content-Range', response.headers['content-range']);
+    if (response.headers['content-range'])
+      res.setHeader('Content-Range', response.headers['content-range']);
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Cache-Control', 'public, max-age=31536000');
-
+    res.setHeader(
+      'Content-Disposition',
+      `${track.performer}_${track.title}.mp3`,
+    );
+    res.status(206);
     response.data.pipe(res);
   }
 }
