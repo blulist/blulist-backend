@@ -36,6 +36,17 @@ services:
       - app-network
     ports:
       - "${PORT}:${PORT}"
+  front:
+    build: 
+      context: ../blulist-front
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - ../blulist-front/.env
+    networks:
+      - app-network
+    ports:
+      - "3000:3000"
 
 
   progress-db:
@@ -70,24 +81,23 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ../certbot/conf:/etc/letsencrypt
       - ../certbot/www:/var/www/certbot
-      # - /etc/letsencrypt/live/api.blulist.ir/fullchain.pem:/etc/nginx/cert.crt
-      # - /etc/letsencrypt/live/api.blulist.ir/privkey.pem:/etc/nginx/cert.key
     networks:
       - app-network
 
-  # certbot:
-  #   image: certbot/certbot
-  #   container_name: certbot
-  #   volumes:
-  #     - ../certbot/conf:/etc/letsencrypt
-  #     - ../certbot/www:/var/www/certbot
-  #   command: certonly --webroot -w /var/www/certbot --force-renewal --email sajjadmrx@gmail.com -d api.blulist.ir --agree-tos
-  #   depends_on:
-  #     - nginx
-  #   networks:
-  #     - app-network
-  #   profiles:
-  #     - profileName
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ../certbot/conf:/etc/letsencrypt
+      - ../certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email sajjadmrx@gmail.com -d api.blulist.ir -d blulist.ir --agree-tos
+    depends_on:
+      - nginx
+    networks:
+      - app-network
+    # profiles:
+    #   - profileName
+    
 
 networks:
   app-network:
