@@ -16,7 +16,7 @@ export class PlaylistsRepository {
     limit: number,
     sort: string | null,
     outType: T,
-  ): Promise<PlaylistResult<T>[]> {
+  ): Promise<any> {
     const op: any = {
       orderBy: [
         {
@@ -51,8 +51,12 @@ export class PlaylistsRepository {
     }
     return this.db.playlist.findMany({
       where: {
+        Track: {
+          some: {},
+        },
         isPrivate: isPrivate,
       },
+
       take: limit,
       skip: (page - 1) * limit,
       ...op,

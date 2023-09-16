@@ -6,6 +6,8 @@ import { ApiModule } from './modules/api_modules/api.module';
 import { LoggingModule } from './modules/logging/logging.module';
 import { DiscordLogger } from './modules/logging/loggers/discord.logger';
 import { ThrottlerModule } from './modules/throttlerModule/throttler.module';
+import * as process from 'process';
+import { ConsoleLogger } from './modules/logging/loggers/console.logger';
 
 @Module({
   imports: [
@@ -14,7 +16,9 @@ import { ThrottlerModule } from './modules/throttlerModule/throttler.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    LoggingModule.register(new DiscordLogger()),
+    LoggingModule.register(
+      process.env.DEV ? new ConsoleLogger() : new DiscordLogger(),
+    ),
     ThrottlerModule,
     ApiModule,
   ],

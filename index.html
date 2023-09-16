@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="fa">
+
 <head>
     <meta charset="UTF-8">
     <title>Music Player</title>
-<!--    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">-->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
-        background-color: #f0f0f0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh; /* این کد به شما کمک می‌کند تا صفحه را از پایین تا بالا پر کنید */
-    }
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* این کد به شما کمک می‌کند تا صفحه را از پایین تا بالا پر کنید */
+        }
 
         .navbar {
             background-color: #007BFF;
@@ -68,9 +70,11 @@
         .audio-player {
             width: 100%;
         }
+
         .playlist-img {
             height: 50%;
         }
+
         /* اضافه کردن استایل به progressBar */
         .progress-container {
             height: 20px;
@@ -88,165 +92,211 @@
         }
     </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">نام سرویس شما</a>
+        </div>
+    </nav>
+
     <div class="container">
-        <a class="navbar-brand" href="#">نام سرویس شما</a>
-    </div>
-</nav>
-
-<div class="container">
-    <h1>پلی لیست ها</h1>
-    <div class="playlist-container" id="playlist-list">
-        <!-- پلی لیست ها در اینجا قرار خواهند گرفت -->
-    </div>
-
-    <h2>جزئیات ترک</h2>
-    <div class="audio-player-container mb-10">
-        <div class="bg-gray text-slate-500 dark:bg-slate-600 dark:text-slate-200 rounded-b-xl flex items-center">
-            <audio id="my-audio" src="http://localhost:5000/stream/track/462519ed-f/mp" controls></audio>
+        <h1>پلی لیست ها</h1>
+        <div class="playlist-container" id="playlist-list">
+            <!-- پلی لیست ها در اینجا قرار خواهند گرفت -->
         </div>
-    </div>
 
-    <div class="lg:col-span-5 xl:col-span-6 flex flex-col">
-        <div class="relative z-10 bg-white rounded-xl shadow-xl ring-1 ring-slate-900/5 divide-y divide-slate-100 my-auto xl:mt-18 dark:bg-slate-800 dark:divide-slate-200/5 dark:highlight-white/10" id="track-list">
-            <nav class="py-4 px-4 sm:px-6 lg:px-4 xl:px-6 text-sm font-medium">
-                <ul class="flex space-x-3">
+        <h2>جزئیات ترک</h2>
+        <div class="audio-player-container mb-10">
+            <div class="bg-gray text-slate-500 dark:bg-slate-600 dark:text-slate-200 rounded-b-xl flex items-center">
+<!--                <audio id="my-audio" controls src="https://api.blulist.ir/stream/track/07780553-7/mp"></audio>-->
+<!--                 <audio id="my-audio" controls src="http://localhost:5000/stream/track/462519ed-f/mp"></audio>-->
+            </div>
+            <button id="seek-button">seek-button </button>
+
+            <audio id="my-audio" controls></audio>
+            <button id="play-button">پخش</button>
+            <button id="stop-button">توقف</button>
+            <button id="seek-forward-button">Seek جلو</button>
+            <button id="seek-backward-button">Seek عقب</button>
+        </div>
+
+        <div class="lg:col-span-5 xl:col-span-6 flex flex-col">
+            <div class="relative z-10 bg-white rounded-xl shadow-xl ring-1 ring-slate-900/5 divide-y divide-slate-100 my-auto xl:mt-18 dark:bg-slate-800 dark:divide-slate-200/5 dark:highlight-white/10"
+                id="track-list">
+                <nav class="py-4 px-4 sm:px-6 lg:px-4 xl:px-6 text-sm font-medium">
+                    <ul class="flex space-x-3">
                         ترک های پلی لیـست
-                </ul>
-            </nav>
+                    </ul>
+                </nav>
 
+            </div>
         </div>
+
     </div>
 
-</div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        const audioUrl = 'http://localhost:5000/stream/track/462519ed-f/mp'; // URL فایل صوتی مورد نظر
+        const audio = document.getElementById('my-audio');
+        const playButton = document.getElementById('play-button');
+        const stopButton = document.getElementById('stop-button');
+        const seekForwardButton = document.getElementById('seek-forward-button');
+        const seekBackwardButton = document.getElementById('seek-backward-button');
 
-<!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.min.js"></script>-->
-<script>
-    const api = "http://localhost:5000" || "https://api.blulist.ir"
-    let playlists = [];
-    let currentPlaylistIndex = 0;
-    let tracks = [];
-    let currentTrackIndex = 0;
-    let audioPlayer;
-    let isPlaying = false;
+        // تنظیم منبع فایل صوتی
+        audio.src = audioUrl;
 
-    function getPlaylists() {
-        $.ajax({
-            url: `${api}/playlists?page=1&limit=20`,
-            method: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                playlists = data.data;
-                displayPlaylists(playlists);
-            }
+        // پخش فایل صوتی
+        playButton.addEventListener('click', () => {
+            audio.play();
         });
-    }
 
-    function getTracks(slug) {
-        $.ajax({
-            url: `${api}/playlists/${slug}/tracks?page=1&limit=20`,
-            method: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                tracks = data.data;
-                displayTracks(tracks);
-                playTrack(tracks[0]);
-            }
+        // توقف فایل صوتی
+        stopButton.addEventListener('click', () => {
+            audio.pause();
+            audio.currentTime = 0;
         });
-    }
 
-    function displayPlaylists(playlists) {
-        const playlistContainer = $('#playlist-list');
-        playlistContainer.empty();
+        // Seek جلو
+        seekForwardButton.addEventListener('click', () => {
+            const currentTime = audio.currentTime;
+            const newTime = currentTime + 10; // میزان seek به جلو (ثانیه)
+            audio.currentTime = newTime;
+        });
 
-        playlists.forEach(playlist => {
-            const playlistCard = $('<div>').addClass('playlist-card');
-            const playlistImage = $('<img>').addClass("playlist-img").attr('src', playlist.isHaveBanner ? `${api}/stream/playlist/${playlist.slug}/banner` : `https://source.unsplash.com/random`);
-            const playlistName = $('<p>').addClass('playlist-name').text(playlist.name);
-            const playlistButton = $('<button>').addClass('btn-playlist').text('پخش');
-            playlistButton.click(function () {
-                currentPlaylistIndex = playlists.indexOf(playlist);
-                getTracks(playlist.slug);
+        // Seek عقب
+        seekBackwardButton.addEventListener('click', () => {
+            const currentTime = audio.currentTime;
+            const newTime = currentTime - 10; // میزان seek عقب (ثانیه)
+            audio.currentTime = newTime;
+        });
+        const api = "http://localhost:5000" || "https://api.blulist.ir"
+        let playlists = [];
+        let currentPlaylistIndex = 0;
+        let tracks = [];
+        let currentTrackIndex = 0;
+        let audioPlayer;
+        let isPlaying = false;
+
+        function getPlaylists() {
+            $.ajax({
+                url: `${api}/playlists?page=1&limit=20`,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    playlists = data.data;
+                    displayPlaylists(playlists);
+                }
             });
+        }
 
-            playlistCard.append(playlistImage, playlistName, playlistButton);
-            playlistContainer.append(playlistCard);
-        });
-    }
+        function getTracks(slug) {
+            $.ajax({
+                url: `${api}/playlists/${slug}/tracks?page=1&limit=20`,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    tracks = data.data;
+                    displayTracks(tracks);
+                    playTrack(tracks[0]);
+                }
+            });
+        }
 
-    function displayTracks(tracks) {
-        const trackList = $('#track-list');
-        trackList.empty();
+        function displayPlaylists(playlists) {
+            const playlistContainer = $('#playlist-list');
+            playlistContainer.empty();
 
-        tracks.forEach(track => {
-            trackList.append(addTrackToX(track));
-        });
-            $(".play-t").click((e)=>{
+            playlists.forEach(playlist => {
+                const playlistCard = $('<div>').addClass('playlist-card');
+                const playlistImage = $('<img>').addClass("playlist-img").attr('src', playlist.isHaveBanner ? `${api}/stream/playlist/${playlist.slug}/banner` : `https://source.unsplash.com/random`);
+                const playlistName = $('<p>').addClass('playlist-name').text(playlist.name);
+                const playlistButton = $('<button>').addClass('btn-playlist').text('پخش');
+                playlistButton.click(function () {
+                    currentPlaylistIndex = playlists.indexOf(playlist);
+                    getTracks(playlist.slug);
+                });
+
+                playlistCard.append(playlistImage, playlistName, playlistButton);
+                playlistContainer.append(playlistCard);
+            });
+        }
+
+        function displayTracks(tracks) {
+            const trackList = $('#track-list');
+            trackList.empty();
+
+            tracks.forEach(track => {
+                trackList.append(addTrackToX(track));
+            });
+            $(".play-t").click((e) => {
                 const dataTrackValue = e.currentTarget.dataset.track // $(this).attr('data-track');
                 const track_ = tracks.find(t => t.uniqueId === dataTrackValue);
                 console.log(track_);
                 playTrack(track_);
             })
 
-        // تقسیم ترک‌ها به صورت ردیفی با چهار ترک در هر ردیف
-        const trackRows = Math.ceil(tracks.length / 4);
-        for (let i = 0; i < trackRows; i++) {
-            const row = $('<div>').addClass('track-row');
-            trackList.children().slice(i * 4, (i + 1) * 4).appendTo(row);
-            trackList.append(row);
-        }
-    }
-    function togglePlayPause(track) {
-        if (audioPlayer && isPlaying) {
-            audioPlayer.pause();
-            isPlaying = false;
-        } else {
-            playTrack(track);
-            isPlaying = true;
-        }
-    }
-
-    function playTrack(track) {
-        if (audioPlayer) {
-            audioPlayer.pause();
-        }
-
- //new Audio(`${api}/stream/track/${track.uniqueId}/mp`);
-        $('#my-audio').attr('src', `${api}/stream/track/${track.uniqueId}/mp`);
-        audioPlayer.play();
-
-        audioPlayer.onended = function () {
-            if (currentTrackIndex < tracks.length - 1) {
-                currentTrackIndex++;
-                playTrack(tracks[currentTrackIndex]);
-            } else {
-                console.log("پایان پلی لیست");
+            // تقسیم ترک‌ها به صورت ردیفی با چهار ترک در هر ردیف
+            const trackRows = Math.ceil(tracks.length / 4);
+            for (let i = 0; i < trackRows; i++) {
+                const row = $('<div>').addClass('track-row');
+                trackList.children().slice(i * 4, (i + 1) * 4).appendTo(row);
+                trackList.append(row);
             }
-        };
+        }
+        function togglePlayPause(track) {
+            if (audioPlayer && isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+            } else {
+                playTrack(track);
+                isPlaying = true;
+            }
+        }
 
-        $('#track-thumbnail').attr('src', `${api}/stream/track/${track.uniqueId}/thumbnail`);
-        $('#track-title').text(track.title);
-        $('#track-performer').text(track.performer);
-        isPlaying = true;
+        function playTrack(track) {
+            if (audioPlayer) {
+                audioPlayer.pause();
+            }
 
-        updateProgressBar();
-    }
+            //new Audio(`${api}/stream/track/${track.uniqueId}/mp`);
+            // $('#my-audio').attr('src', `${api}/stream/track/${track.uniqueId}/mp`);
+            audioPlayer = document.getElementById('my-audio')
+            audioPlayer.src = `${api}/stream/track/${track.uniqueId}/mp`
+            audioPlayer.play();
 
-    function updateProgressBar() {
-        const progressBar = $('#progress-bar');
+            audioPlayer.onended = function () {
+                if (currentTrackIndex < tracks.length - 1) {
+                    currentTrackIndex++;
+                    playTrack(tracks[currentTrackIndex]);
+                } else {
+                    console.log("پایان پلی لیست");
+                }
+            };
 
-        audioPlayer.addEventListener('timeupdate', function () {
-            const currentTime = audioPlayer.currentTime;
-            const duration = audioPlayer.duration;
-            const progress = (currentTime / duration) * 100;
-            progressBar.css('width', progress + '%');
-        });
-    }
+            $('#track-thumbnail').attr('src', `${api}/stream/track/${track.uniqueId}/thumbnail`);
+            $('#track-title').text(track.title);
+            $('#track-performer').text(track.performer);
+            isPlaying = true;
 
-    function addTrackToX(track){
-        return `
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progressBar = $('#progress-bar');
+
+            audioPlayer.addEventListener('timeupdate', function () {
+                const currentTime = audioPlayer.currentTime;
+                const duration = audioPlayer.duration;
+                const progress = (currentTime / duration) * 100;
+                progressBar.css('width', progress + '%');
+            });
+        }
+
+        function addTrackToX(track) {
+            return `
                     <article class="p-4 sm:p-6 lg:p-4 xl:p-6 space-x-4 items-start sm:space-x-6 lg:space-x-4 xl:space-x-6 flex">
                 <img src="${`${api}/stream/track/${track.uniqueId}/thumbnail`}" loading="lazy" decoding="async" alt="" width="60" height="88" class="flex-none rounded-md bg-slate-100" />
                 <div class="min-w-0 relative flex-auto play-t hover:bg-gray-100 hover:cursor-pointer" data-track="${track.uniqueId}">
@@ -292,50 +342,51 @@
 
 
         `
-    }
-
-    // دکمه "بعدی"
-    $('#next-button').click(function () {
-        if (currentTrackIndex < tracks.length - 1) {
-            currentTrackIndex++;
-            playTrack(tracks[currentTrackIndex]);
         }
-    });
 
-    // دکمه "توقف"
-    $('#stop-button').click(function () {
-        if (audioPlayer && isPlaying) {
-            audioPlayer.pause();
-            isPlaying = false;
-        }
-    });
+        // دکمه "بعدی"
+        $('#next-button').click(function () {
+            if (currentTrackIndex < tracks.length - 1) {
+                currentTrackIndex++;
+                playTrack(tracks[currentTrackIndex]);
+            }
+        });
 
-    // دکمه "قبلی"
-    $('#prev-button').click(function () {
-        if (currentTrackIndex > 0) {
-            currentTrackIndex--;
-            playTrack(tracks[currentTrackIndex]);
-        }
-    });
+        // دکمه "توقف"
+        $('#stop-button').click(function () {
+            if (audioPlayer && isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+            }
+        });
 
-    // دکمه "بعدی" پلی لیست
-    $('#next-playlist-button').click(function () {
-        if (currentPlaylistIndex < playlists.length - 1) {
-            currentPlaylistIndex++;
-            getTracks(playlists[currentPlaylistIndex].slug);
-        }
-    });
+        // دکمه "قبلی"
+        $('#prev-button').click(function () {
+            if (currentTrackIndex > 0) {
+                currentTrackIndex--;
+                playTrack(tracks[currentTrackIndex]);
+            }
+        });
 
-    // دکمه "قبلی" پلی لیست
-    $('#prev-playlist-button').click(function () {
-        if (currentPlaylistIndex > 0) {
-            currentPlaylistIndex--;
-            getTracks(playlists[currentPlaylistIndex].slug);
-        }
-    });
+        // دکمه "بعدی" پلی لیست
+        $('#next-playlist-button').click(function () {
+            if (currentPlaylistIndex < playlists.length - 1) {
+                currentPlaylistIndex++;
+                getTracks(playlists[currentPlaylistIndex].slug);
+            }
+        });
 
-    // درخواست دریافت پلی لیست ها
-   // getPlaylists();
-</script>
+        // دکمه "قبلی" پلی لیست
+        $('#prev-playlist-button').click(function () {
+            if (currentPlaylistIndex > 0) {
+                currentPlaylistIndex--;
+                getTracks(playlists[currentPlaylistIndex].slug);
+            }
+        });
+
+        // درخواست دریافت پلی لیست ها
+        // getPlaylists();
+    </script>
 </body>
+
 </html>
