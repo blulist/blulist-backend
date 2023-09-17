@@ -87,7 +87,7 @@ export class PlaylistsService {
         hasNextPage,
         hasPrevPage,
         nextPage,
-        totalCount,
+        playlistsCount: totalCount,
       },
     };
   }
@@ -107,6 +107,14 @@ export class PlaylistsService {
       page,
       limit,
     );
+
+    const totalCount = await this.trackRepo.getPublicTotalCount(playlist.id);
+    const totalPages = Math.ceil(totalCount / limit);
+
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+    const nextPage = hasNextPage ? page + 1 : null;
+
     const tracks = tracksDB.map((track: Track) => {
       delete track.addedById;
       // return track;
@@ -120,7 +128,13 @@ export class PlaylistsService {
     });
     return {
       statusCode: HttpStatus.OK,
-      data: tracks,
+      data: {
+        tracks,
+        tracksCount: totalCount,
+        hasNextPage,
+        hasPrevPage,
+        nextPage,
+      },
     };
   }
 }

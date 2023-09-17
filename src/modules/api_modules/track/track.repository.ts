@@ -27,4 +27,11 @@ export class TrackRepository {
       },
     });
   }
+  getPublicTotalCount(playlistId: number): Promise<number> {
+    return this.db.track.count({
+      where: {
+        playlistId: playlistId,
+      },
+    });
+  }
 }

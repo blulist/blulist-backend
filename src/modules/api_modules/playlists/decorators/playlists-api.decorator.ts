@@ -88,7 +88,7 @@ export function GetAllPlaylistsApi() {
             hasNextPage: true,
             hasPrevPage: true,
             nextPage: 4,
-            totalCount: 4,
+            playlistsCount: 4,
           },
         },
       },
@@ -106,22 +106,21 @@ export function GetPlaylistTracks() {
       schema: {
         example: {
           statusCode: 200,
-          data: [
-            {
-              uniqueId: '18d2d2bb-1',
-              title: 'Adam Barfi~MelonMusic.ir',
-              performer: 'Parsalip',
-              duration: 165,
-              isHaveThumbnail: false,
-            },
-            {
-              uniqueId: '9e47930a-4',
-              title: 'H u r t',
-              performer: 'MooVan x Olafur Arnalds',
-              duration: 214,
-              isHaveThumbnail: true,
-            },
-          ],
+          data: {
+            tracks: [
+              {
+                uniqueId: '99c06196-4',
+                title: 'باران',
+                performer: 'MooVan',
+                duration: 368,
+                isHaveThumbnail: false,
+              },
+            ],
+            tracksCount: 6,
+            hasNextPage: true,
+            hasPrevPage: false,
+            nextPage: 2,
+          },
         },
       },
     }),
