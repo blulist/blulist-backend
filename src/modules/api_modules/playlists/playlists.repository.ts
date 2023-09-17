@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
+  Playlist,
   PlaylistOutTypeEnum,
   PlaylistResult,
 } from './interfaces/playlists.interface';
@@ -83,5 +84,18 @@ export class PlaylistsRepository {
     return this.db.playlist.findUnique(op) as unknown as Promise<
       PlaylistResult<T>
     > | null;
+  }
+
+  updateViewCount(slug: string): Promise<Playlist> {
+    return this.db.playlist.update({
+      where: {
+        slug,
+      },
+      data: {
+        viewCount: {
+          increment: 1,
+        },
+      },
+    });
   }
 }

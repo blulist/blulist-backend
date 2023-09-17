@@ -8,21 +8,34 @@ import {
 } from './interfaces/playlists.interface';
 import { TrackRepository } from '../track/track.repository';
 import { Track } from '../track/interfaces/track.interface';
-
+import { RedisService } from '../../redis/redis.service';
+import { isIPv4 } from 'net';
 @Injectable()
 export class PlaylistsService {
   constructor(
     private playlistRepo: PlaylistsRepository,
     private trackRepo: TrackRepository,
+    private redisService: RedisService,
   ) {}
 
-  async getPlaylist(slug: string): Promise<ResponseFormat<any>> {
+  async getPlaylist(
+    slug: string,
+    ip: string | null,
+  ): Promise<ResponseFormat<any>> {
     const playlist = await this.playlistRepo.findOneBySlug(
       slug,
       PlaylistOutTypeEnum.WithCounts,
     );
     if (!playlist) throw new NotFoundException('پلی لیست یافت نشد');
-
+    if (ip && isIPv4(ip)) {
+      const viewKey = `blu:view:p_slug_${playlist.slug}:ip_${ip}`;
+      const hasView = await this.redisService.get(viewKey);
+      if (!hasView) {
+        await this.playlistRepo.updateViewCount(playlist.slug);
+        await this.redisService.setex(viewKey, 60 * 30, '1'); // save for 30min
+        playlist.viewCount++;
+      }
+    }
     return {
       statusCode: HttpStatus.OK,
       data: {

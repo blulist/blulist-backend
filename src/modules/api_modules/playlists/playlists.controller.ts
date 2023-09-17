@@ -1,4 +1,4 @@
-import { Controller, Param, Query, UseFilters } from '@nestjs/common';
+import { Controller, Param, Query, Req, UseFilters } from '@nestjs/common';
 import {
   GetAllPlaylistsApi,
   GetPlaylist,
@@ -7,6 +7,7 @@ import {
 import { PlaylistsService } from './playlists.service';
 import { ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../shared/filters/http-exception.filter';
+import { Request } from 'express';
 
 @ApiTags('🎶 Playlists')
 @UseFilters(HttpExceptionFilter)
@@ -14,8 +15,9 @@ import { HttpExceptionFilter } from '../shared/filters/http-exception.filter';
 export class PlaylistsController {
   constructor(private playlistsService: PlaylistsService) {}
   @GetPlaylist()
-  onGetPlaylist(@Param('slug') slug: string) {
-    return this.playlistsService.getPlaylist(slug);
+  onGetPlaylist(@Param('slug') slug: string, @Req() req: Request) {
+    console.log(req.ips);
+    return this.playlistsService.getPlaylist(slug, req.ip);
   }
 
   @GetAllPlaylistsApi()
