@@ -62,6 +62,13 @@ export class PlaylistsService {
       sort,
       PlaylistOutTypeEnum.WithCounts,
     );
+    const totalCount = await this.playlistRepo.getPublicTotalCount();
+    const totalPages = Math.ceil(totalCount / limit);
+
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+    const nextPage = hasNextPage ? page + 1 : null;
+
     const playlists = playlistsDB.map((pl) => {
       return {
         slug: pl.slug,
@@ -75,7 +82,13 @@ export class PlaylistsService {
     });
     return {
       statusCode: HttpStatus.OK,
-      data: playlists,
+      data: {
+        playlists,
+        hasNextPage,
+        hasPrevPage,
+        nextPage,
+        totalCount,
+      },
     };
   }
   async getPlaylistTracks(

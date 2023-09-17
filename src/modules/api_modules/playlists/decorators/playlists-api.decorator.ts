@@ -73,35 +73,23 @@ export function GetAllPlaylistsApi() {
       schema: {
         example: {
           statusCode: 200,
-          data: [
-            {
-              slug: 'd0192c40',
-              name: 'test',
-              isHaveBanner: false,
-              viewCount: 0,
-              createdAt: '2023-09-05T22:26:14.802Z',
-              tracksCount: 1,
-              likesCount: 0,
-            },
-            {
-              slug: 'e9d2b7f0',
-              name: '🌱 شجریـآن چیل',
-              isHaveBanner: true,
-              viewCount: 4,
-              createdAt: '2023-09-05T13:18:27.457Z',
-              tracksCount: 6,
-              likesCount: 0,
-            },
-            {
-              slug: 'ffc8619c',
-              name: '🤌 rap remix',
-              isHaveBanner: true,
-              viewCount: 1,
-              createdAt: '2023-09-05T12:43:21.145Z',
-              tracksCount: 1,
-              likesCount: 0,
-            },
-          ],
+          data: {
+            playlists: [
+              {
+                slug: 'e9d2b7f0',
+                name: '🌱 شجریـآن چیل',
+                isHaveBanner: true,
+                viewCount: 6,
+                createdAt: '2023-09-05T13:18:27.457Z',
+                tracksCount: 6,
+                likesCount: 0,
+              },
+            ],
+            hasNextPage: true,
+            hasPrevPage: true,
+            nextPage: 4,
+            totalCount: 4,
+          },
         },
       },
     }),

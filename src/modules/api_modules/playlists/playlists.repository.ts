@@ -86,6 +86,17 @@ export class PlaylistsRepository {
     > | null;
   }
 
+  async getPublicTotalCount() {
+    return this.db.playlist.count({
+      where: {
+        Track: {
+          some: {},
+        },
+        isPrivate: false,
+      },
+    });
+  }
+
   updateViewCount(slug: string): Promise<Playlist> {
     return this.db.playlist.update({
       where: {
