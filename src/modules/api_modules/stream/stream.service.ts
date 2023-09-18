@@ -138,7 +138,7 @@ export class StreamService {
     res.setHeader('Cache-Control', 'public, max-age=31536000');
     res.setHeader(
       'Content-Disposition',
-      `${track.performer}_${track.title}.mp3`,
+      `attachment; filename="${track.performer}_${track.title}.mp3"`,
     );
     res.status(206);
     response.data.pipe(res);
